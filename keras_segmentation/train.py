@@ -100,11 +100,10 @@ def train(model,
         else:
             loss_k = 'categorical_crossentropy'
 
-        print('É tetra')
         model.compile(
             loss=loss_k, optimizer=optimizer_name,
             metrics=[
-                tf.keras.metrics.Accuracy(),
+                'accuracy',
                 tf.keras.metrics.Precision(),
                 tf.keras.metrics.Recall(),
                 tf.keras.metrics.MeanIoU(num_classes=n_classes),
