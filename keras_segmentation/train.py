@@ -1,9 +1,9 @@
 import json
-from .data_utils.data_loader import image_segmentation_generator, \
-    verify_segmentation_dataset
+from .data_utils.data_loader import image_segmentation_generator, verify_segmentation_dataset
 import glob
 import six
 from keras.callbacks import Callback
+import tensorflow as tf
 
 
 def find_latest_checkpoint(checkpoints_path, fail_safe=True):
@@ -100,9 +100,16 @@ def train(model,
         else:
             loss_k = 'categorical_crossentropy'
 
-        model.compile(loss=loss_k,
-                      optimizer=optimizer_name,
-                      metrics=['accuracy'])
+        print('É tetra')
+        model.compile(
+            loss=loss_k, optimizer=optimizer_name,
+            metrics=[
+                tf.keras.metrics.Accuracy(),
+                tf.keras.metrics.Precision(),
+                tf.keras.metrics.Recall(),
+                tf.keras.metrics.MeanIoU(num_classes=n_classes),
+            ]
+        )
 
     if checkpoints_path is not None:
         with open(checkpoints_path+"_config.json", "w") as f:
