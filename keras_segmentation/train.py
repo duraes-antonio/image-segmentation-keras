@@ -51,7 +51,7 @@ class CheckpointsCallback(Callback):
 			self.model.save_weights(path_out)
 			print("saved ", path_out)
 
-			for i in range(1, epoch - 3):
+			for i in range(0, epoch - 2):
 				files_path = glob.glob(f'{self.checkpoints_path}/{prefix}.{i}.*')
 				for f_path in files_path:
 					os.remove(f_path)
