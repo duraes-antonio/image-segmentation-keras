@@ -45,13 +45,13 @@ class CheckpointsCallback(Callback):
 	def __init__(self, checkpoints_path):
 		self.checkpoints_path = checkpoints_path
 
-	def on_epoch_end(self, epoch, logs=None):
+	def on_epoch_end(self, epoch, logs=None, prefix='ckpt'):
 		if self.checkpoints_path is not None:
 			self.model.save_weights(self.checkpoints_path + "." + str(epoch))
-			print("saved ", self.checkpoints_path + "." + str(epoch))
+			print("saved ", os.path.join(self.checkpoints_path, f'{prefix}.{epoch}'))
 
 			for i in range(1, epoch - 3):
-				files_path = glob.glob(f'{self.checkpoints_path}/ckpt.{i}.*')
+				files_path = glob.glob(f'{self.checkpoints_path}/{prefix}.{i}.*')
 				for f_path in files_path:
 					os.remove(f_path)
 
@@ -118,7 +118,7 @@ def train(model,
 		)
 
 	if checkpoints_path is not None:
-		with open(checkpoints_path + "_config.json", "w") as f:
+		with open(checkpoints_path + "ckpt_config.json", "w") as f:
 			json.dump({
 				"model_class": model.model_name,
 				"n_classes": n_classes,
