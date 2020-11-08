@@ -47,16 +47,13 @@ class CheckpointsCallback(Callback):
 
 	def on_epoch_end(self, epoch, logs=None):
 		if self.checkpoints_path is not None:
-			for i in range(1, epoch - 5):
+			self.model.save_weights(self.checkpoints_path + "." + str(epoch))
+			print("saved ", self.checkpoints_path + "." + str(epoch))
+
+			for i in range(1, epoch - 3):
 				files_path = glob.glob(f'{self.checkpoints_path}/ckpt.{i}.*')
-				print(files_path)
-
 				for f_path in files_path:
-					pass
-					# os.remove(f_path)
-
-			# self.model.save_weights(self.checkpoints_path + "." + str(epoch))
-			# print("saved ", self.checkpoints_path + "." + str(epoch))
+					os.remove(f_path)
 
 
 def train(model,
@@ -165,16 +162,7 @@ def train(model,
 			val_images, val_annotations, val_batch_size,
 			n_classes, input_height, input_width, output_height, output_width)
 
-	model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-		filepath=checkpoints_path,
-		save_weights_only=True,
-		monitor='val_acc',
-		mode='max',
-		save_best_only=True
-	)
-
 	callbacks = [
-		model_checkpoint_callback,
 		CheckpointsCallback(checkpoints_path),
 	]
 
