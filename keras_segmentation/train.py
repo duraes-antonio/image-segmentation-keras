@@ -47,8 +47,9 @@ class CheckpointsCallback(Callback):
 
 	def on_epoch_end(self, epoch, logs=None, prefix='ckpt'):
 		if self.checkpoints_path is not None:
-			self.model.save_weights(self.checkpoints_path + "." + str(epoch))
-			print("saved ", os.path.join(self.checkpoints_path, f'{prefix}.{epoch}'))
+			path_out = os.path.join(self.checkpoints_path, f'{prefix}.{epoch}')
+			self.model.save_weights(path_out)
+			print("saved ", path_out)
 
 			for i in range(1, epoch - 3):
 				files_path = glob.glob(f'{self.checkpoints_path}/{prefix}.{i}.*')
