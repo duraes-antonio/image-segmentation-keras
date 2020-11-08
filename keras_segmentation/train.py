@@ -206,8 +206,17 @@ def train(model,
 	tensorboard = TensorBoard(log_dir='logs/{}'.format(time()))
 	plot_losses = TrainingPlot()
 
+	model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+		filepath=checkpoints_path,
+		save_weights_only=True,
+		monitor='val_acc',
+		mode='max',
+		save_best_only=True
+	)
+
 	callbacks = [
-		CheckpointsCallback(checkpoints_path),
+		# CheckpointsCallback(checkpoints_path),
+		model_checkpoint_callback,
 		tensorboard,
 		plot_losses
 	]
