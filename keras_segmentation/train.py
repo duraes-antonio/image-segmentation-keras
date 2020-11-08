@@ -52,7 +52,8 @@ class CheckpointsCallback(Callback):
 				print(files_path)
 
 				for f_path in files_path:
-					os.remove(f_path)
+					pass
+					# os.remove(f_path)
 
 			# self.model.save_weights(self.checkpoints_path + "." + str(epoch))
 			# print("saved ", self.checkpoints_path + "." + str(epoch))
