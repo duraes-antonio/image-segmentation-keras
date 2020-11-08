@@ -1,12 +1,10 @@
 import glob
 import json
-from time import time
+import os
 
-import matplotlib.pyplot as plt
-import numpy
 import six
 import tensorflow as tf
-from keras.callbacks import Callback, TensorBoard
+from keras.callbacks import Callback
 
 from .data_utils.data_loader import image_segmentation_generator, verify_segmentation_dataset
 
@@ -49,52 +47,14 @@ class CheckpointsCallback(Callback):
 
 	def on_epoch_end(self, epoch, logs=None):
 		if self.checkpoints_path is not None:
-			self.model.save_weights(self.checkpoints_path + "." + str(epoch))
-			print("saved ", self.checkpoints_path + "." + str(epoch))
+			for i in range(1, epoch - 2):
+				files_path = glob.glob(f'{self.checkpoints_path}/ckpt.{i}.*')
 
+				for f_path in files_path:
+					os.remove(f_path)
 
-class TrainingPlot(Callback):
-
-	# This function is called when the training begins
-	def on_train_begin(self, logs={}):
-		# Initialize the lists for holding the logs, losses and accuracies
-		self.losses = []
-		self.acc = []
-		self.val_losses = []
-		self.val_acc = []
-		self.logs = []
-
-	# This function is called at the end of each epoch
-	def on_epoch_end(self, epoch, logs={}):
-		# Append the logs, losses and accuracies to the lists
-		self.logs.append(logs)
-		self.losses.append(logs.get('loss'))
-		self.acc.append(logs.get('acc'))
-		self.val_losses.append(logs.get('val_loss'))
-		self.val_acc.append(logs.get('val_acc'))
-
-		# Before plotting ensure at least 2 epochs have passed
-		if len(self.losses) > 1:
-			N = numpy.arange(0, len(self.losses))
-
-			# You can chose the style of your preference
-			# print(plt.style.available) to see the available options
-			# plt.style.use("seaborn")
-
-			# Plot train loss, train acc, val loss and val acc against epochs passed
-			plt.figure()
-			plt.plot(N, self.losses, label="train_loss")
-			plt.plot(N, self.acc, label="train_acc")
-			plt.plot(N, self.val_losses, label="val_loss")
-			plt.plot(N, self.val_acc, label="val_acc")
-			plt.title("Training Loss and Accuracy [Epoch {}]".format(epoch))
-			plt.xlabel("Epoch #")
-			plt.ylabel("Loss/Accuracy")
-			plt.legend()
-			# Make sure there exists a folder called output in the current directory
-			# or replace 'output' with whatever direcory you want to put in the plots
-			plt.savefig('output/Epoch-{}.png'.format(epoch))
-			plt.close()
+			# self.model.save_weights(self.checkpoints_path + "." + str(epoch))
+			# print("saved ", self.checkpoints_path + "." + str(epoch))
 
 
 def train(model,
@@ -203,9 +163,6 @@ def train(model,
 			val_images, val_annotations, val_batch_size,
 			n_classes, input_height, input_width, output_height, output_width)
 
-	tensorboard = TensorBoard(log_dir='logs/{}'.format(time()))
-	plot_losses = TrainingPlot()
-
 	model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
 		filepath=checkpoints_path,
 		save_weights_only=True,
@@ -215,10 +172,8 @@ def train(model,
 	)
 
 	callbacks = [
-		# CheckpointsCallback(checkpoints_path),
+		CheckpointsCallback(checkpoints_path),
 		model_checkpoint_callback,
-		tensorboard,
-		plot_losses
 	]
 
 	if not validate:
