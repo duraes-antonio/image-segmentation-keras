@@ -47,8 +47,9 @@ class CheckpointsCallback(Callback):
 
 	def on_epoch_end(self, epoch, logs=None):
 		if self.checkpoints_path is not None:
-			for i in range(1, epoch - 2):
+			for i in range(1, epoch - 5):
 				files_path = glob.glob(f'{self.checkpoints_path}/ckpt.{i}.*')
+				print(files_path)
 
 				for f_path in files_path:
 					os.remove(f_path)
@@ -172,8 +173,8 @@ def train(model,
 	)
 
 	callbacks = [
-		CheckpointsCallback(checkpoints_path),
 		model_checkpoint_callback,
+		CheckpointsCallback(checkpoints_path),
 	]
 
 	if not validate:
