@@ -6,7 +6,7 @@ import os
 import six
 import tensorflow as tf
 from keras.callbacks import Callback
-
+from pathlib import Path
 from .data_utils.data_loader import image_segmentation_generator, verify_segmentation_dataset
 
 
@@ -64,7 +64,8 @@ def train(
 		validate=False, val_images=None, val_annotations=None, val_batch_size=2,
 		auto_resume_checkpoint=False, load_weights=None, steps_per_epoch=512,
 		val_steps_per_epoch=512, gen_use_multiprocessing=False, ignore_zero_class=False,
-		optimizer_name='adam', do_augment=False, augmentation_name="aug_all"
+		optimizer_name='adam', do_augment=False, augmentation_name="aug_all",
+		loss='categorical_crossentropy'
 ):
 	print('Model:\t\t\t', model)
 	print('Input size:\t\t', f'{input_width}x{input_height} (wxh)')
@@ -103,7 +104,7 @@ def train(
 		if ignore_zero_class:
 			loss_k = masked_categorical_crossentropy
 		else:
-			loss_k = 'categorical_crossentropy'
+			loss_k = loss
 
 		model.compile(
 			loss=loss_k, optimizer=optimizer_name,
@@ -160,7 +161,9 @@ def train(
 			val_images, val_annotations, val_batch_size,
 			n_classes, input_height, input_width, output_height, output_width)
 
-	logdir = os.path.join("logs", datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+	folder_name = f'model-{model.model_name}_opt-{optimizer_name}_loss-{loss}_batch-{batch_size}_epoch-{epochs}'
+	logdir = f"logs/{folder_name}"
+	Path(logdir).mkdir(parents=True, exist_ok=True)
 	tensorboard_callback = tf.keras.callbacks.TensorBoard(logdir, histogram_freq=1)
 
 	callbacks = [
