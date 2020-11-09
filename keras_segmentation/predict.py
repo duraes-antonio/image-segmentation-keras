@@ -22,7 +22,7 @@ def model_from_checkpoint_path(checkpoints_path, prefix='ckpt'):
 	assert (
 		os.path.isfile(os.path.join(checkpoints_path, f"{prefix}_config.json"))
 	), "Checkpoint not found."
-	model_config = json.loads(open(checkpoints_path + f"{prefix}_config.json", "r").read())
+	model_config = json.loads(open(os.path.join(checkpoints_path, f"{prefix}_config.json"), "r").read())
 	latest_weights = find_latest_checkpoint(checkpoints_path)
 	assert (latest_weights is not None), "Checkpoint not found."
 	model = model_from_name[model_config['model_class']](
@@ -251,15 +251,12 @@ def predict_video(model=None, inp=None, output=None,
 def evaluate(model=None, inp_images=None, annotations=None,
 			 inp_images_dir=None, annotations_dir=None, checkpoints_path=None):
 	if model is None:
-		assert (checkpoints_path is not None), \
-			"Please provide the model or the checkpoints_path"
+		assert (checkpoints_path is not None), "Please provide the model or the checkpoints_path"
 		model = model_from_checkpoint_path(checkpoints_path)
 
 	if inp_images is None:
-		assert (inp_images_dir is not None), \
-			"Please provide inp_images or inp_images_dir"
-		assert (annotations_dir is not None), \
-			"Please provide inp_images or inp_images_dir"
+		assert (inp_images_dir is not None), "Please provide inp_images or inp_images_dir"
+		assert (annotations_dir is not None), "Please provide inp_images or inp_images_dir"
 
 		paths = get_pairs_from_paths(inp_images_dir, annotations_dir)
 		paths = list(zip(*paths))
