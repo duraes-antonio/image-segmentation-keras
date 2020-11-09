@@ -300,10 +300,20 @@ def evaluate(model=None, inp_images=None, annotations=None,
     cl_wise_score = tp / (tp + fp + fn + 0.000000000001)
     n_pixels_norm = n_pixels / np.sum(n_pixels)
     frequency_weighted_IU = np.sum(cl_wise_score*n_pixels_norm)
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    f1_score = tp / (tp + 0.5 * (fp + fn))
+
+    mean_f1_score = np.mean(f1_score)
+    mean_precision = np.mean(precision)
+    mean_recall = np.mean(recall)
     mean_IU = np.mean(cl_wise_score)
 
     return {
         "frequency_weighted_IU": frequency_weighted_IU,
         "mean_IU": mean_IU,
-        "class_wise_IU": cl_wise_score
+        "class_wise_IU": cl_wise_score,
+        "mean_f1_score": mean_f1_score,
+        "mean_precision": mean_precision,
+        "mean_recall": mean_recall,
     }
