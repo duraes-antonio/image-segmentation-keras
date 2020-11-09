@@ -57,29 +57,25 @@ class CheckpointsCallback(Callback):
 					os.remove(f_path)
 
 
-def train(model,
-		  train_images,
-		  train_annotations,
-		  input_height=None,
-		  input_width=None,
-		  n_classes=None,
-		  verify_dataset=True,
-		  checkpoints_path=None,
-		  epochs=5,
-		  batch_size=2,
-		  validate=False,
-		  val_images=None,
-		  val_annotations=None,
-		  val_batch_size=2,
-		  auto_resume_checkpoint=False,
-		  load_weights=None,
-		  steps_per_epoch=512,
-		  val_steps_per_epoch=512,
-		  gen_use_multiprocessing=False,
-		  ignore_zero_class=False,
-		  optimizer_name='adam',
-		  do_augment=False,
-		  augmentation_name="aug_all"):
+def train(
+		model, train_images, train_annotations, input_height=None, input_width=None,
+		n_classes=None, verify_dataset=True, checkpoints_path=None, epochs=5, batch_size=2,
+		validate=False, val_images=None, val_annotations=None, val_batch_size=2,
+		auto_resume_checkpoint=False, load_weights=None, steps_per_epoch=512,
+		val_steps_per_epoch=512, gen_use_multiprocessing=False, ignore_zero_class=False,
+		optimizer_name='adam', do_augment=False, augmentation_name="aug_all"
+):
+	print('Model:\t\t\t', model)
+	print('Input size:\t\t', f'{input_width}x{input_height} (wxh)')
+	print('Num. classes:\t\t', n_classes)
+	print('Checkpoint Dir:\t\t', checkpoints_path)
+	print('Epochs:\t\t\t', epochs)
+	print('Validate:\t\t\t', validate)
+	print('Val. batch size:\t\t', val_batch_size)
+	print('Auto resume checkpoint:\t', auto_resume_checkpoint)
+	print('Use Multiprocessing:\t', gen_use_multiprocessing)
+	print('Optimizer:\t\t\t', optimizer_name)
+
 	from .models.all_models import model_from_name
 	# check if user gives model name instead of the model object
 	if isinstance(model, six.string_types):
