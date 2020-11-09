@@ -1,3 +1,4 @@
+import datetime
 import glob
 import json
 import os
@@ -159,8 +160,12 @@ def train(
 			val_images, val_annotations, val_batch_size,
 			n_classes, input_height, input_width, output_height, output_width)
 
+	logdir = os.path.join("logs", datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+	tensorboard_callback = tf.keras.callbacks.TensorBoard(logdir, histogram_freq=1)
+
 	callbacks = [
 		CheckpointsCallback(checkpoints_path),
+		tensorboard_callback
 	]
 
 	if not validate:
