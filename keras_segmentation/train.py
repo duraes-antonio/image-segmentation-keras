@@ -70,11 +70,11 @@ def train(
 	print('Num. classes:\t\t', n_classes)
 	print('Checkpoint Dir:\t\t', checkpoints_path)
 	print('Epochs:\t\t\t', epochs)
-	print('Validate:\t\t\t', validate)
-	print('Val. batch size:\t\t', val_batch_size)
+	print('Validate:\t\t', validate)
+	print('Val. batch size:\t', val_batch_size)
 	print('Auto resume checkpoint:\t', auto_resume_checkpoint)
 	print('Use Multiprocessing:\t', gen_use_multiprocessing)
-	print('Optimizer:\t\t\t', optimizer_name)
+	print('Optimizer:\t\t', optimizer_name)
 
 	from .models.all_models import model_from_name
 	# check if user gives model name instead of the model object
