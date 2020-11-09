@@ -115,7 +115,7 @@ def train(
 		)
 
 	if checkpoints_path is not None:
-		with open(checkpoints_path + "ckpt_config.json", "w") as f:
+		with open(os.path.join(checkpoints_path, "ckpt_config.json"), "w") as f:
 			json.dump({
 				"model_class": model.model_name,
 				"n_classes": n_classes,
