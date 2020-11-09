@@ -65,7 +65,7 @@ def train(
 		auto_resume_checkpoint=False, load_weights=None, steps_per_epoch=512,
 		val_steps_per_epoch=512, gen_use_multiprocessing=False, ignore_zero_class=False,
 		optimizer_name='adam', do_augment=False, augmentation_name="aug_all",
-		loss='categorical_crossentropy'
+		loss='categorical_crossentropy', logs_path='../drive/logs'
 ):
 	print('Model:\t\t\t', model)
 	print('Input size:\t\t', f'{input_width}x{input_height} (wxh)')
@@ -162,7 +162,7 @@ def train(
 			n_classes, input_height, input_width, output_height, output_width)
 
 	folder_name = f'model-{model.model_name}_opt-{optimizer_name}_loss-{loss}_batch-{batch_size}_epoch-{epochs}'
-	logdir = f"logs/{folder_name}"
+	logdir = f"{logs_path}/{folder_name}"
 	Path(logdir).mkdir(parents=True, exist_ok=True)
 	tensorboard_callback = tf.keras.callbacks.TensorBoard(logdir, histogram_freq=1)
 
