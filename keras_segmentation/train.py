@@ -118,8 +118,8 @@ def train(
 			loss=loss_k, optimizer=opt,
 			metrics=[
 				'accuracy',
-				'precision',
-				'recall',
+				tf.keras.metrics.Recall(),
+				tf.keras.metrics.Precision(),
 				tf.keras.metrics.MeanIoU(num_classes=n_classes),
 			]
 		)
