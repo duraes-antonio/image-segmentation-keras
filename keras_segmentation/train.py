@@ -1,12 +1,12 @@
-import datetime
 import glob
 import json
 import os
+from pathlib import Path
 
 import six
 import tensorflow as tf
 from keras.callbacks import Callback
-from pathlib import Path
+
 from .data_utils.data_loader import image_segmentation_generator, verify_segmentation_dataset
 
 
@@ -105,13 +105,21 @@ def train(
 			loss_k = masked_categorical_crossentropy
 		else:
 			loss_k = loss
+		opt = optimizer_name
+		if (optimizer_name.lower() == 'adam'):
+			opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+		elif (optimizer_name.lower() == 'sgd'):
+			lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+				initial_learning_rate=1e-2, decay_steps=10000, decay_rate=0.9
+			)
+			opt = tf.keras.optimizers.SGD(learning_rate=lr_schedule)
 
 		model.compile(
-			loss=loss_k, optimizer=optimizer_name,
+			loss=loss_k, optimizer=opt,
 			metrics=[
 				'accuracy',
-				tf.keras.metrics.Precision(),
-				tf.keras.metrics.Recall(),
+				'precision',
+				'recall',
 				tf.keras.metrics.MeanIoU(num_classes=n_classes),
 			]
 		)
