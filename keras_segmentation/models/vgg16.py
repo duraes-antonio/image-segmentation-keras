@@ -14,15 +14,22 @@ elif IMAGE_ORDERING == 'channels_last':
                      "vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5"
 
 
-def get_vgg_encoder(input_height=224,  input_width=224, pretrained='imagenet'):
+def get_vgg_encoder(
+        input_height=224,  input_width=224, pretrained='imagenet',
+        dropout=False
+):
 
     assert input_height % 32 == 0
     assert input_width % 32 == 0
+
+    dropout_value = 0.2
+    img_input = None
 
     if IMAGE_ORDERING == 'channels_first':
         img_input = Input(shape=(3, input_height, input_width))
     elif IMAGE_ORDERING == 'channels_last':
         img_input = Input(shape=(input_height, input_width, 3))
+    img_input = Dropout(dropout_value if dropout else 0)(img_input)
 
     x = Conv2D(64, (3, 3), activation='relu', padding='same',
                name='block1_conv1', data_format=IMAGE_ORDERING)(img_input)
@@ -30,6 +37,7 @@ def get_vgg_encoder(input_height=224,  input_width=224, pretrained='imagenet'):
                name='block1_conv2', data_format=IMAGE_ORDERING)(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='block1_pool',
                      data_format=IMAGE_ORDERING)(x)
+    x = Dropout(dropout_value if dropout else 0)(x)
     f1 = x
     # Block 2
     x = Conv2D(128, (3, 3), activation='relu', padding='same',
@@ -38,6 +46,7 @@ def get_vgg_encoder(input_height=224,  input_width=224, pretrained='imagenet'):
                name='block2_conv2', data_format=IMAGE_ORDERING)(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='block2_pool',
                      data_format=IMAGE_ORDERING)(x)
+    x = Dropout(dropout_value if dropout else 0)(x)
     f2 = x
 
     # Block 3
@@ -49,6 +58,7 @@ def get_vgg_encoder(input_height=224,  input_width=224, pretrained='imagenet'):
                name='block3_conv3', data_format=IMAGE_ORDERING)(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='block3_pool',
                      data_format=IMAGE_ORDERING)(x)
+    x = Dropout(dropout_value if dropout else 0)(x)
     f3 = x
 
     # Block 4
@@ -60,6 +70,7 @@ def get_vgg_encoder(input_height=224,  input_width=224, pretrained='imagenet'):
                name='block4_conv3', data_format=IMAGE_ORDERING)(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='block4_pool',
                      data_format=IMAGE_ORDERING)(x)
+    x = Dropout(dropout_value if dropout else 0)(x)
     f4 = x
 
     # Block 5
@@ -71,6 +82,7 @@ def get_vgg_encoder(input_height=224,  input_width=224, pretrained='imagenet'):
                name='block5_conv3', data_format=IMAGE_ORDERING)(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='block5_pool',
                      data_format=IMAGE_ORDERING)(x)
+    x = Dropout(dropout_value if dropout else 0)(x)
     f5 = x
 
     if pretrained == 'imagenet':

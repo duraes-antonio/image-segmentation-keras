@@ -8,6 +8,7 @@ import tensorflow as tf
 from keras.callbacks import Callback
 
 from .data_utils.data_loader import image_segmentation_generator, verify_segmentation_dataset
+from .metrics import get_f1
 
 
 def find_latest_checkpoint(checkpoints_path, fail_safe=True):
@@ -64,10 +65,11 @@ def train(
 		validate=False, val_images=None, val_annotations=None, val_batch_size=2,
 		auto_resume_checkpoint=False, load_weights=None, steps_per_epoch=512,
 		val_steps_per_epoch=512, gen_use_multiprocessing=False, ignore_zero_class=False,
-		optimizer_name='adam', do_augment=False, augmentation_name="aug_all",
+		optimizer_name='adam', do_augment=False, dropout=False, augmentation_name="aug_all",
 		loss='categorical_crossentropy', logs_path='../drive/logs'
 ):
 	print('Model:\t\t\t', model)
+	print('Dropout:\t\t\t', dropout)
 	print('Input size:\t\t', f'{input_width}x{input_height} (wxh)')
 	print('Num. classes:\t\t', n_classes)
 	print('Checkpoint Dir:\t\t', checkpoints_path)
@@ -85,9 +87,10 @@ def train(
 		assert (n_classes is not None), "Please provide the n_classes"
 		if (input_height is not None) and (input_width is not None):
 			model = model_from_name[model](
-				n_classes, input_height=input_height, input_width=input_width)
+				n_classes, input_height=input_height,
+				input_width=input_width, dropout=dropout)
 		else:
-			model = model_from_name[model](n_classes)
+			model = model_from_name[model](n_classes, dropout=dropout)
 
 	n_classes = model.n_classes
 	input_height = model.input_height
@@ -113,6 +116,11 @@ def train(
 				initial_learning_rate=1e-2, decay_steps=10000, decay_rate=0.9
 			)
 			opt = tf.keras.optimizers.SGD(learning_rate=lr_schedule)
+		elif (optimizer_name.lower() == 'rmsprop'):
+			opt = tf.keras.optimizers.RMSprop(
+				learning_rate=0.001, rho=0.9, momentum=0.0,
+				epsilon=1e-07, centered=True, name='RMSprop',
+			)
 
 		model.compile(
 			loss=loss_k, optimizer=opt,
@@ -121,6 +129,9 @@ def train(
 				tf.keras.metrics.Recall(),
 				tf.keras.metrics.Precision(),
 				tf.keras.metrics.MeanIoU(num_classes=n_classes),
+				get_f1,
+				tf.keras.metrics.AUC(),
+				tf.keras.metrics.AUC(curve='PR')
 			]
 		)
 

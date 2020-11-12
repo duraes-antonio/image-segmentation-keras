@@ -67,8 +67,8 @@ def unet_mini(n_classes, input_height=360, input_width=480):
 
 
 def _unet(n_classes, encoder, l1_skip_conn=True, input_height=416,
-          input_width=608):
-
+          input_width=608, dropout=False):
+    dropout_value = 0.2
     img_input, levels = encoder(
         input_height=input_height, input_width=input_width)
     [f1, f2, f3, f4, f5] = levels
@@ -77,18 +77,21 @@ def _unet(n_classes, encoder, l1_skip_conn=True, input_height=416,
 
     o = (ZeroPadding2D((1, 1), data_format=IMAGE_ORDERING))(o)
     o = (Conv2D(512, (3, 3), padding='valid' , activation='relu' , data_format=IMAGE_ORDERING))(o)
+    o = Dropout(dropout_value if dropout else 0)(o)
     o = (BatchNormalization())(o)
 
     o = (UpSampling2D((2, 2), data_format=IMAGE_ORDERING))(o)
     o = (concatenate([o, f3], axis=MERGE_AXIS))
     o = (ZeroPadding2D((1, 1), data_format=IMAGE_ORDERING))(o)
     o = (Conv2D(256, (3, 3), padding='valid', activation='relu' , data_format=IMAGE_ORDERING))(o)
+    o = Dropout(dropout_value if dropout else 0)(o)
     o = (BatchNormalization())(o)
 
     o = (UpSampling2D((2, 2), data_format=IMAGE_ORDERING))(o)
     o = (concatenate([o, f2], axis=MERGE_AXIS))
     o = (ZeroPadding2D((1, 1), data_format=IMAGE_ORDERING))(o)
     o = (Conv2D(128, (3, 3), padding='valid' , activation='relu' , data_format=IMAGE_ORDERING))(o)
+    o = Dropout(dropout_value if dropout else 0)(o)
     o = (BatchNormalization())(o)
 
     o = (UpSampling2D((2, 2), data_format=IMAGE_ORDERING))(o)
@@ -98,6 +101,7 @@ def _unet(n_classes, encoder, l1_skip_conn=True, input_height=416,
 
     o = (ZeroPadding2D((1, 1), data_format=IMAGE_ORDERING))(o)
     o = (Conv2D(64, (3, 3), padding='valid', activation='relu', data_format=IMAGE_ORDERING))(o)
+    o = Dropout(dropout_value if dropout else 0)(o)
     o = (BatchNormalization())(o)
 
     o = Conv2D(n_classes, (3, 3), padding='same',
@@ -116,9 +120,13 @@ def unet(n_classes, input_height=416, input_width=608, encoder_level=3):
     return model
 
 
-def vgg_unet(n_classes, input_height=416, input_width=608, encoder_level=3):
-
-    model = _unet(n_classes, get_vgg_encoder,
+def vgg_unet(
+        n_classes, input_height=416, input_width=608, encoder_level=3,
+        dropout=False
+):
+    def get_vgg(input_height: int, input_width: int, dropout=dropout):
+        return get_vgg_encoder(dropout=dropout, input_height=input_height, input_width=input_width)
+    model = _unet(n_classes, get_vgg,
                   input_height=input_height, input_width=input_width)
     model.model_name = "vgg_unet"
     return model
