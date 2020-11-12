@@ -8,7 +8,7 @@ import tensorflow as tf
 from keras.callbacks import Callback
 
 from .data_utils.data_loader import image_segmentation_generator, verify_segmentation_dataset
-from .metrics import get_f1
+from .metrics import f1_score
 
 
 def find_latest_checkpoint(checkpoints_path, fail_safe=True):
@@ -129,9 +129,9 @@ def train(
 				tf.keras.metrics.Recall(),
 				tf.keras.metrics.Precision(),
 				tf.keras.metrics.MeanIoU(num_classes=n_classes),
-				get_f1,
-				tf.keras.metrics.AUC(),
-				tf.keras.metrics.AUC(curve='PR')
+				f1_score,
+				tf.keras.metrics.AUC(name='AUC_tpr_fpr'),
+				tf.keras.metrics.AUC(curve='PR', name='AUC_prec_recall')
 			]
 		)
 

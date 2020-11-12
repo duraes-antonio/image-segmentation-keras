@@ -14,7 +14,7 @@ def get_iou(gt, pr, n_classes):
 	return class_wise
 
 
-def get_f1(y_true, y_pred):  # taken from old keras source code
+def f1_score(y_true, y_pred):  # taken from old keras source code
 	true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
 	possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
 	predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
