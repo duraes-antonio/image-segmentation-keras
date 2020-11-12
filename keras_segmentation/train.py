@@ -131,7 +131,7 @@ def train(
 				tf.keras.metrics.MeanIoU(num_classes=n_classes),
 				f1_score,
 				tf.keras.metrics.AUC(name='AUC_tpr_fpr'),
-				tf.keras.metrics.AUC(curve='PR', name='AUC_prec_recall')
+				tf.keras.metrics.AUC(curve='PR', name='AUC_PR')
 			]
 		)
 

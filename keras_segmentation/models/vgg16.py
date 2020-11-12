@@ -16,7 +16,6 @@ elif IMAGE_ORDERING == 'channels_last':
 
 def get_vgg_encoder(
         input_height=224,  input_width=224, pretrained='imagenet',
-        dropout=False
 ):
     assert input_height % 32 == 0
     assert input_width % 32 == 0
