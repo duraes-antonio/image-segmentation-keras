@@ -69,8 +69,7 @@ def unet_mini(n_classes, input_height=360, input_width=480):
 def _unet(n_classes, encoder, l1_skip_conn=True, input_height=416,
           input_width=608, dropout=False):
     dropout_value = 0.2
-    img_input, levels = encoder(
-        input_height=input_height, input_width=input_width)
+    img_input, levels = encoder(input_height=input_height, input_width=input_width)
     [f1, f2, f3, f4, f5] = levels
 
     o = f4
