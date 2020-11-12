@@ -16,6 +16,7 @@ elif IMAGE_ORDERING == 'channels_last':
 
 def get_vgg_encoder(
         input_height=224,  input_width=224, pretrained='imagenet',
+        dropout=False
 ):
     assert input_height % 32 == 0
     assert input_width % 32 == 0
@@ -29,7 +30,6 @@ def get_vgg_encoder(
 
     if img_input is not None:
         img_input = Dropout(0.2)(img_input)
-    x = Sequential()
     x = Conv2D(64, (3, 3), activation='relu', padding='same',
                name='block1_conv1', data_format=IMAGE_ORDERING)(img_input)
     x = Conv2D(64, (3, 3), activation='relu', padding='same',
