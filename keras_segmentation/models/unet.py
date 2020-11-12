@@ -126,8 +126,10 @@ def vgg_unet(
 ):
     def get_vgg(input_height: int, input_width: int, dropout=dropout):
         return get_vgg_encoder(dropout=dropout, input_height=input_height, input_width=input_width)
-    model = _unet(n_classes, get_vgg,
-                  input_height=input_height, input_width=input_width)
+    model = _unet(
+        n_classes, get_vgg, input_height=input_height,
+        input_width=input_width, dropout=dropout
+    )
     model.model_name = "vgg_unet"
     return model
 
