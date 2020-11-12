@@ -29,24 +29,26 @@ def get_vgg_encoder(
         img_input = Input(shape=(3, input_height, input_width))
     elif IMAGE_ORDERING == 'channels_last':
         img_input = Input(shape=(input_height, input_width, 3))
-    img_input = Dropout(dropout_value if dropout else 0)(img_input)
+
+    if img_input is not None:
+        img_input = Dropout(0.2)(img_input)
 
     x = Conv2D(64, (3, 3), activation='relu', padding='same',
                name='block1_conv1', data_format=IMAGE_ORDERING)(img_input)
     x = Conv2D(64, (3, 3), activation='relu', padding='same',
                name='block1_conv2', data_format=IMAGE_ORDERING)(x)
-    x = Dropout(dropout_value if dropout else 0)(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='block1_pool',
                      data_format=IMAGE_ORDERING)(x)
+    x = Dropout(0.2)(x)
     f1 = x
     # Block 2
     x = Conv2D(128, (3, 3), activation='relu', padding='same',
                name='block2_conv1', data_format=IMAGE_ORDERING)(x)
     x = Conv2D(128, (3, 3), activation='relu', padding='same',
                name='block2_conv2', data_format=IMAGE_ORDERING)(x)
-    x = Dropout(dropout_value if dropout else 0)(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='block2_pool',
                      data_format=IMAGE_ORDERING)(x)
+    x = Dropout(0.2)(x)
     f2 = x
 
     # Block 3
@@ -56,7 +58,6 @@ def get_vgg_encoder(
                name='block3_conv2', data_format=IMAGE_ORDERING)(x)
     x = Conv2D(256, (3, 3), activation='relu', padding='same',
                name='block3_conv3', data_format=IMAGE_ORDERING)(x)
-    x = Dropout(dropout_value if dropout else 0)(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='block3_pool',
                      data_format=IMAGE_ORDERING)(x)
     f3 = x
@@ -68,7 +69,6 @@ def get_vgg_encoder(
                name='block4_conv2', data_format=IMAGE_ORDERING)(x)
     x = Conv2D(512, (3, 3), activation='relu', padding='same',
                name='block4_conv3', data_format=IMAGE_ORDERING)(x)
-    x = Dropout(dropout_value if dropout else 0)(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='block4_pool',
                      data_format=IMAGE_ORDERING)(x)
     f4 = x
@@ -80,7 +80,6 @@ def get_vgg_encoder(
                name='block5_conv2', data_format=IMAGE_ORDERING)(x)
     x = Conv2D(512, (3, 3), activation='relu', padding='same',
                name='block5_conv3', data_format=IMAGE_ORDERING)(x)
-    x = Dropout(dropout_value if dropout else 0)(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='block5_pool',
                      data_format=IMAGE_ORDERING)(x)
     f5 = x
