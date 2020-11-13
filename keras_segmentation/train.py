@@ -3,9 +3,14 @@ import json
 import os
 from pathlib import Path
 
+import numpy as np
 import six
 import tensorflow as tf
 from keras.callbacks import Callback
+from tensorflow.python.keras import backend as K
+from tensorflow.python.keras.utils import metrics_utils
+from tensorflow.python.keras.utils.generic_utils import to_list
+from tensorflow.python.ops import init_ops, math_ops
 
 from .data_utils.data_loader import image_segmentation_generator, verify_segmentation_dataset
 from .metrics import f1_score
@@ -57,6 +62,71 @@ class CheckpointsCallback(Callback):
 				files_path = glob.glob(f'{self.checkpoints_path}/{prefix}.{i}.*')
 				for f_path in files_path:
 					os.remove(f_path)
+
+
+class FPR(tf.keras.metrics.Metric):
+	def __init__(self, thresholds=None, top_k=None, class_id=None, name='FPR', dtype=None, **kwargs):
+		super().__init__(name, dtype, **kwargs)
+		self.init_thresholds = thresholds
+		self.top_k = top_k
+		self.class_id = class_id
+
+		default_threshold = 0.5 if top_k is None else metrics_utils.NEG_INF
+		self.thresholds = metrics_utils.parse_init_thresholds(
+			thresholds, default_threshold=default_threshold)
+		self.false_positives = self.add_weight(
+			'false_positives',
+			shape=(len(self.thresholds),),
+			initializer=init_ops.zeros_initializer)
+		self.true_negatives = self.add_weight(
+			'true_negatives',
+			shape=(len(self.thresholds),),
+			initializer=init_ops.zeros_initializer)
+
+	def update_state(self, y_true, y_pred, sample_weight=None):
+		"""Accumulates true positive and false negative statistics.
+
+		Args:
+		  y_true: The ground truth values, with the same dimensions as `y_pred`.
+			Will be cast to `bool`.
+		  y_pred: The predicted values. Each element must be in the range `[0, 1]`.
+		  sample_weight: Optional weighting of each example. Defaults to 1. Can be a
+			`Tensor` whose rank is either 0, or the same rank as `y_true`, and must
+			be broadcastable to `y_true`.
+
+		Returns:
+		  Update op.
+		"""
+		return metrics_utils.update_confusion_matrix_variables(
+			{
+				metrics_utils.ConfusionMatrix.FALSE_POSITIVES: self.false_positives,
+				metrics_utils.ConfusionMatrix.TRUE_NEGATIVES: self.true_negatives
+			},
+			y_true,
+			y_pred,
+			thresholds=self.thresholds,
+			top_k=self.top_k,
+			class_id=self.class_id,
+			sample_weight=sample_weight)
+
+	def result(self):
+		result = math_ops.div_no_nan(self.false_positives,
+									 self.false_positives + self.true_negatives)
+		return result[0] if len(self.thresholds) == 1 else result
+
+	def reset_states(self):
+		num_thresholds = len(to_list(self.thresholds))
+		K.batch_set_value(
+			[(v, np.zeros((num_thresholds,))) for v in self.variables])
+
+	def get_config(self):
+		config = {
+			'thresholds': self.init_thresholds,
+			'top_k': self.top_k,
+			'class_id': self.class_id
+		}
+		base_config = super(FPR, self).get_config()
+		return dict(list(base_config.items()) + list(config.items()))
 
 
 def train(
@@ -129,10 +199,9 @@ def train(
 				'accuracy',
 				tf.keras.metrics.Recall(),
 				tf.keras.metrics.Precision(),
-				tf.keras.metrics.MeanIoU(num_classes=n_classes),
 				f1_score,
-				tf.keras.metrics.AUC(name='AUC_tpr_fpr'),
-				tf.keras.metrics.AUC(curve='PR', name='AUC_PR')
+				tf.keras.metrics.MeanIoU(num_classes=n_classes),
+				FPR()
 			]
 		)
 
