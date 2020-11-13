@@ -69,7 +69,7 @@ def train(
 		loss='categorical_crossentropy', logs_path='../drive/logs', lr=0.0005
 ):
 	print('Model:\t\t\t', model)
-	print('Dropout:\t\t\t', dropout)
+	print('Dropout:\t\t', dropout)
 	print('Input size:\t\t', f'{input_width}x{input_height} (wxh)')
 	print('Num. classes:\t\t', n_classes)
 	print('Checkpoint Dir:\t\t', checkpoints_path)
@@ -79,6 +79,7 @@ def train(
 	print('Auto resume checkpoint:\t', auto_resume_checkpoint)
 	print('Use Multiprocessing:\t', gen_use_multiprocessing)
 	print('Optimizer:\t\t', optimizer_name)
+	print('Learning Rate:\t\t', lr)
 
 	from .models.all_models import model_from_name
 	# check if user gives model name instead of the model object
