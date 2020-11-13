@@ -66,7 +66,7 @@ def train(
 		auto_resume_checkpoint=False, load_weights=None, steps_per_epoch=512,
 		val_steps_per_epoch=512, gen_use_multiprocessing=False, ignore_zero_class=False,
 		optimizer_name='adam', do_augment=False, dropout=False, augmentation_name="aug_all",
-		loss='categorical_crossentropy', logs_path='../drive/logs'
+		loss='categorical_crossentropy', logs_path='../drive/logs', lr=0.0005
 ):
 	print('Model:\t\t\t', model)
 	print('Dropout:\t\t\t', dropout)
@@ -110,15 +110,15 @@ def train(
 			loss_k = loss
 		opt = optimizer_name
 		if (optimizer_name.lower() == 'adam'):
-			opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+			opt = tf.keras.optimizers.Adam(learning_rate=lr)
 		elif (optimizer_name.lower() == 'sgd'):
 			lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-				initial_learning_rate=1e-2, decay_steps=10000, decay_rate=0.9
+				initial_learning_rate=1e-4, decay_steps=10000, decay_rate=0.9
 			)
 			opt = tf.keras.optimizers.SGD(learning_rate=lr_schedule)
 		elif (optimizer_name.lower() == 'rmsprop'):
 			opt = tf.keras.optimizers.RMSprop(
-				learning_rate=0.001, rho=0.9, momentum=0.0,
+				learning_rate=lr, rho=0.9, momentum=0.0,
 				epsilon=1e-07, centered=True, name='RMSprop',
 			)
 
