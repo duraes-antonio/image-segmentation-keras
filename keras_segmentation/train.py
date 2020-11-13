@@ -180,7 +180,7 @@ def train(
 			val_images, val_annotations, val_batch_size,
 			n_classes, input_height, input_width, output_height, output_width)
 
-	folder_name = f'model-{model.model_name}_opt-{optimizer_name}_loss-{loss}_batch-{batch_size}_epoch-{epochs}'
+	folder_name = f'model-{model.model_name}_opt-{optimizer_name}_loss-{loss}_batch-{batch_size}_epoch-{epochs}_LR-{lr}'
 	logdir = f"{logs_path}/{folder_name}"
 	Path(logdir).mkdir(parents=True, exist_ok=True)
 	tensorboard_callback = tf.keras.callbacks.TensorBoard(logdir, histogram_freq=1)
