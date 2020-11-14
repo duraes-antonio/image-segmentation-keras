@@ -64,70 +64,6 @@ class CheckpointsCallback(Callback):
 					os.remove(f_path)
 
 
-class FPR(tf.keras.metrics.Metric):
-	def __init__(self, thresholds=None, top_k=None, class_id=None, name='FPR', dtype=None, **kwargs):
-		super().__init__(name, dtype, **kwargs)
-		self.init_thresholds = thresholds
-		self.top_k = top_k
-		self.class_id = class_id
-
-		default_threshold = 0.5 if top_k is None else metrics_utils.NEG_INF
-		self.thresholds = metrics_utils.parse_init_thresholds(
-			thresholds, default_threshold=default_threshold)
-		self.false_positives = self.add_weight(
-			'false_positives',
-			shape=(len(self.thresholds),),
-			initializer=init_ops.zeros_initializer)
-		self.true_negatives = self.add_weight(
-			'true_negatives',
-			shape=(len(self.thresholds),),
-			initializer=init_ops.zeros_initializer)
-
-	def update_state(self, y_true, y_pred, sample_weight=None):
-		"""Accumulates true positive and false negative statistics.
-
-		Args:
-		  y_true: The ground truth values, with the same dimensions as `y_pred`.
-			Will be cast to `bool`.
-		  y_pred: The predicted values. Each element must be in the range `[0, 1]`.
-		  sample_weight: Optional weighting of each example. Defaults to 1. Can be a
-			`Tensor` whose rank is either 0, or the same rank as `y_true`, and must
-			be broadcastable to `y_true`.
-
-		Returns:
-		  Update op.
-		"""
-		return metrics_utils.update_confusion_matrix_variables(
-			{
-				metrics_utils.ConfusionMatrix.FALSE_POSITIVES: self.false_positives,
-				metrics_utils.ConfusionMatrix.TRUE_NEGATIVES: self.true_negatives
-			},
-			y_true,
-			y_pred,
-			thresholds=self.thresholds,
-			top_k=self.top_k,
-			class_id=self.class_id,
-			sample_weight=sample_weight)
-
-	def result(self):
-		result = math_ops.div_no_nan(self.false_positives,
-									 self.false_positives + self.true_negatives)
-		return result[0] if len(self.thresholds) == 1 else result
-
-	def reset_states(self):
-		num_thresholds = len(to_list(self.thresholds))
-		K.batch_set_value(
-			[(v, np.zeros((num_thresholds,))) for v in self.variables])
-
-	def get_config(self):
-		config = {
-			'thresholds': self.init_thresholds,
-			'top_k': self.top_k,
-			'class_id': self.class_id
-		}
-		base_config = super(FPR, self).get_config()
-		return dict(list(base_config.items()) + list(config.items()))
-
 
 def train(
 		model, train_images, train_annotations, input_height=None, input_width=None,
@@ -199,9 +135,12 @@ def train(
 				'accuracy',
 				tf.keras.metrics.Recall(),
 				tf.keras.metrics.Precision(),
-				f1_score,
 				tf.keras.metrics.MeanIoU(num_classes=n_classes),
-				FPR()
+				f1_score,
+				tf.keras.metrics.FalsePositives(name='FP'),
+				tf.keras.metrics.TruePositives(name='TP'),
+				tf.keras.metrics.FalseNegatives(name='FN'),
+				tf.keras.metrics.TrueNegatives(name='TN'),
 			]
 		)
 
@@ -262,10 +201,10 @@ def train(
 	]
 
 	if not validate:
-		return model.fit_generator(train_gen, steps_per_epoch,
+		model.fit_generator(train_gen, steps_per_epoch,
 							epochs=epochs, callbacks=callbacks)
 	else:
-		return model.fit_generator(train_gen,
+		model.fit_generator(train_gen,
 							steps_per_epoch,
 							validation_data=val_gen,
 							validation_steps=val_steps_per_epoch,
