@@ -262,10 +262,10 @@ def train(
 	]
 
 	if not validate:
-		model.fit_generator(train_gen, steps_per_epoch,
+		return model.fit_generator(train_gen, steps_per_epoch,
 							epochs=epochs, callbacks=callbacks)
 	else:
-		model.fit_generator(train_gen,
+		return model.fit_generator(train_gen,
 							steps_per_epoch,
 							validation_data=val_gen,
 							validation_steps=val_steps_per_epoch,
