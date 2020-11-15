@@ -121,7 +121,7 @@ def train(
 		elif (optimizer_name.lower() == 'sgd'):
 			lr = 0.01
 			decay_rate = lr / epochs
-			momentum = 0.8
+			momentum = 0.9
 			opt = tf.keras.optimizers.SGD(lr=lr, momentum=momentum, decay=decay_rate, nesterov=False)
 		elif (optimizer_name.lower() == 'rmsprop'):
 			opt = tf.keras.optimizers.RMSprop(
