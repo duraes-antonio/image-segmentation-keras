@@ -119,7 +119,10 @@ def train(
 		if (optimizer_name.lower() == 'adam'):
 			opt = tf.keras.optimizers.Adam(learning_rate=lr)
 		elif (optimizer_name.lower() == 'sgd'):
-			opt = tf.keras.optimizers.SGD(learning_rate=lr)
+			lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+				initial_learning_rate=1e-4, decay_steps=512, decay_rate=0.9
+			)
+			opt = tf.keras.optimizers.SGD(learning_rate=lr_schedule)
 		elif (optimizer_name.lower() == 'rmsprop'):
 			opt = tf.keras.optimizers.RMSprop(
 				learning_rate=lr, rho=0.9, momentum=0.0,
