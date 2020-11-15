@@ -125,7 +125,7 @@ def train(
 			opt = tf.keras.optimizers.SGD(lr=lr, momentum=momentum, decay=decay_rate, nesterov=False)
 		elif (optimizer_name.lower() == 'rmsprop'):
 			opt = tf.keras.optimizers.RMSprop(
-				learning_rate=lr, rho=0.9, momentum=0.0,
+				learning_rate=lr, rho=0.9, momentum=0.9,
 				epsilon=1e-07, centered=True, name='RMSprop',
 			)
 
