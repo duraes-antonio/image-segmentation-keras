@@ -120,7 +120,7 @@ def train(
 			opt = tf.keras.optimizers.Adam(learning_rate=lr)
 		elif (optimizer_name.lower() == 'adadelta'):
 			opt = tf.keras.optimizers.Adadelta(
-				learning_rate=lr, rho=0.95, epsilon=1e-07,
+				learning_rate=lr, rho=0.9, epsilon=1e-07,
 				name="Adadelta"
 			)
 		elif (optimizer_name.lower() == 'sgd'):
