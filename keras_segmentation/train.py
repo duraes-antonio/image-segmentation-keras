@@ -142,10 +142,8 @@ def train(
 				tf.keras.metrics.Precision(),
 				tf.keras.metrics.MeanIoU(num_classes=n_classes),
 				f1_score,
-				tf.keras.metrics.FalsePositives(name='FP'),
-				tf.keras.metrics.TruePositives(name='TP'),
-				tf.keras.metrics.FalseNegatives(name='FN'),
-				tf.keras.metrics.TrueNegatives(name='TN'),
+				tf.keras.metrics.AUC(name='auc'),
+				tf.keras.metrics.AUC(curve='PR', name='auc_pr'),
 			]
 		)
 
