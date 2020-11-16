@@ -118,6 +118,11 @@ def train(
 		opt = optimizer_name
 		if (optimizer_name.lower() == 'adam'):
 			opt = tf.keras.optimizers.Adam(learning_rate=lr)
+		elif (optimizer_name.lower() == 'adadelta'):
+			opt = tf.keras.optimizers.Adadelta(
+				learning_rate=lr, rho=0.95, epsilon=1e-07,
+				name="Adadelta"
+			)
 		elif (optimizer_name.lower() == 'sgd'):
 			lr = 0.01
 			decay_rate = lr / epochs
