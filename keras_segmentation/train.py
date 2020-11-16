@@ -138,9 +138,9 @@ def train(
 			loss=loss_k, optimizer=opt,
 			metrics=[
 				'accuracy',
-				tf.keras.metrics.Recall(),
-				tf.keras.metrics.Precision(),
-				tf.keras.metrics.MeanIoU(num_classes=n_classes),
+				tf.keras.metrics.Recall(name='recall'),
+				tf.keras.metrics.Precision(name='precision'),
+				tf.keras.metrics.MeanIoU(num_classes=n_classes, name='miou'),
 				f1_score,
 				tf.keras.metrics.AUC(name='auc'),
 				tf.keras.metrics.AUC(curve='PR', name='auc_pr'),
