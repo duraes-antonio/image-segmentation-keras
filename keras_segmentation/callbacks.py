@@ -19,5 +19,5 @@ class ROCCallback(Callback):
 
 		# plot and save roc curve
 		fig, ax = plt.subplots(figsize=(16, 12))
-		plot_roc(y_true, y_pred, ax=ax)
+		plot_roc(y_true, y_pred.astype(int), ax=ax)
 		fig.savefig(os.path.join(self.image_dir, f'roc_curve_epoch_{epoch}'))
