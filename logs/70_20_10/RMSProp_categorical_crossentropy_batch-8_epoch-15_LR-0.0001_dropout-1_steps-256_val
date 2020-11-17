@@ -1,0 +1,1 @@
+{'frequency_weighted_IU': 0.7546823711628358, 'mean_IU': 0.5839039850685684, 'mean_IU_no_background': 0.4648820324776291, 'class_wise_IU': array([0.94096984, 0.68946626, 0.37433234, 0.3308475 ]), 'class_wise_IU_no_background': array([0.68946626, 0.37433234, 0.3308475 ]), 'mean_f1_score': 0.706931897612594, 'mean_precision': 0.7217680132555913, 'mean_recall': 0.723411499714836}
