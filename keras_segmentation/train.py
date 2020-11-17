@@ -12,6 +12,7 @@ from tensorflow.python.keras.utils import metrics_utils
 from tensorflow.python.keras.utils.generic_utils import to_list
 from tensorflow.python.ops import init_ops, math_ops
 
+from .callbacks import ROCCallback
 from .data_utils.data_loader import image_segmentation_generator, verify_segmentation_dataset
 from .metrics import f1_score
 
@@ -196,10 +197,15 @@ def train(
 	folder_name = f'{optimizer_name}_batch-{batch_size}_epoch-{epochs}_lr-{lr}_drop-{drop}'
 	logdir = f"{logs_path}/{folder_name}"
 	Path(logdir).mkdir(parents=True, exist_ok=True)
-	tensorboard_callback = tf.keras.callbacks.TensorBoard(logdir, histogram_freq=1)
 
+	tensorboard_callback = tf.keras.callbacks.TensorBoard(logdir, histogram_freq=1)
+	roc_callback = ROCCallback(
+		model=model, validation_data=val_gen,
+		image_dir=f'{logdir}/performance'
+	)
 	callbacks = [
 		CheckpointsCallback(checkpoints_path),
+		roc_callback,
 		tensorboard_callback
 	]
 
