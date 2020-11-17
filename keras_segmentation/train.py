@@ -200,17 +200,8 @@ def train(
 
 	tensorboard_callback = tf.keras.callbacks.TensorBoard(logdir, histogram_freq=1)
 
-	roc_val_gen = image_segmentation_generator(
-		val_images, val_annotations, val_batch_size, n_classes,
-		input_height, input_width, output_height, output_width
-	)
-	roc_callback = ROCCallback(
-		model=model, validation_data=roc_val_gen,
-		image_dir=f'{logdir}/performance'
-	)
 	callbacks = [
 		CheckpointsCallback(checkpoints_path),
-		roc_callback,
 		tensorboard_callback
 	]
 
