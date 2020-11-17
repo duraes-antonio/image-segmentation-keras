@@ -16,8 +16,10 @@ class ROCCallback(Callback):
 	def on_epoch_end(self, epoch, logs={}):
 		y_pred = np.asarray(self.model.predict(self.validation_data[0]))
 		y_true = self.validation_data[1]
+		print('PRED', y_pred)
+		print('TRUE', y_true)
 
 		# plot and save roc curve
 		fig, ax = plt.subplots(figsize=(16, 12))
-		plot_roc(y_true, y_pred.astype(int), ax=ax)
+		plot_roc(y_true.astype(int), y_pred.astype(int), ax=ax)
 		fig.savefig(os.path.join(self.image_dir, f'roc_curve_epoch_{epoch}'))
