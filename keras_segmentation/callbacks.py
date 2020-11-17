@@ -9,7 +9,7 @@ class ROCCallback(Callback):
 	def __init__(self, model, validation_data, image_dir):
 		super().__init__()
 		self.model = model
-		self.validation_data = validation_data
+		self.validation_data = next(validation_data)
 		os.makedirs(image_dir, exist_ok=True)
 		self.image_dir = image_dir
 

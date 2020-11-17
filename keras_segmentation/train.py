@@ -199,8 +199,13 @@ def train(
 	Path(logdir).mkdir(parents=True, exist_ok=True)
 
 	tensorboard_callback = tf.keras.callbacks.TensorBoard(logdir, histogram_freq=1)
+
+	roc_val_gen = image_segmentation_generator(
+		val_images, val_annotations, val_batch_size, n_classes,
+		input_height, input_width, output_height, output_width
+	)
 	roc_callback = ROCCallback(
-		model=model, validation_data=val_gen,
+		model=model, validation_data=roc_val_gen,
 		image_dir=f'{logdir}/performance'
 	)
 	callbacks = [
