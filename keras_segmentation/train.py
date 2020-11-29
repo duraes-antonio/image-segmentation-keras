@@ -12,7 +12,6 @@ from tensorflow.python.keras.utils import metrics_utils
 from tensorflow.python.keras.utils.generic_utils import to_list
 from tensorflow.python.ops import init_ops, math_ops
 
-from .callbacks import ROCCallback
 from .data_utils.data_loader import image_segmentation_generator, verify_segmentation_dataset
 from .metrics import f1_score
 
